@@ -1,0 +1,515 @@
+---
+title: "Stat 33A - Lecture Notes 9"
+date: Oct 18, 2020
+output: pdf_document
+---
+
+
+
+Apply Function Basics
+=====================
+
+Doing the same operation repeatedly is a common pattern in programming.
+
+Vectorization is one way, but not all functions are vectorized.
+
+
+In R, the "apply functions" are another way to do something repeatedly.
+
+The apply functions call a function on each element of a vector or list.
+
+
+
+The `lapply()` Function
+---------------------
+
+The first and most important apply function is `lapply()`. The syntax is:
+```
+lapply(X, FUN, ...)
+```
+
+The function `FUN` is called once for each element of `X`, with the element as
+the first argument. The `...` is for additional arguments to `FUN`, which are
+held constant across all calls.
+
+
+Unrealistic example:
+```{r}
+x = c(1, 7, 9)
+lapply(x, sin)
+
+sin(x)
+```
+In practice, it's clearer and more efficient to use vectorization here.
+
+
+Let's use the dogs data for some realistic examples:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+
+head(dogs)
+lapply(dogs, class)
+
+class(dogs)
+
+str(dogs)
+
+cols = c("weight", "height", "price")
+lapply(dogs[cols], median, na.rm = TRUE)
+```
+
+`lapply()` always returns the result as a list.
+
+"l" for **list** result.
+
+
+
+The `sapply()` Function
+---------------------
+
+`sapply()` simplifies the result to a vector, when possible.
+
+"s" for **simplified** result.
+
+Examples:
+```{r}
+sapply(dogs[cols], median, na.rm = TRUE)
+```
+
+The `sapply()` function is useful if you are working interactively.
+
+
+
+
+
+
+Apply Function Examples
+=======================
+
+The California Counties AQI data set is available on the bCourse (`aqi.zip`).
+
+Let's load one of the files:
+```{r}
+ala = read.csv("data/aqi/counties/2020.10.16_ca_alameda.csv")
+head(ala)
+```
+
+What are the classes of the columns?
+```{r}
+sapply(ala, class)
+```
+
+How can we load all of the files?
+```{r}
+files = list.files("data/aqi/counties", full.names = TRUE)
+
+#read.csv(files[1])
+aqi = lapply(files, read.csv)
+
+class(aqi)
+length(aqi)
+sapply(aqi, class)
+
+aqi[[2]]
+```
+
+The `rbind` function combines two data frames by stacking them together:
+```{r}
+all(names(aqi[[1]]) == names(aqi[[2]]))
+
+rbind(aqi[[1]], aqi[[2]])
+```
+
+The data frames we want to stack are in a list.
+
+How can we call `rbind` on all of them?
+
+
+The `do.call` function calls a function using a list as the arguments:
+```{r}
+mean(c(1, 2, 3, NA), na.rm = TRUE)
+
+args = list(c(1, 2, 3, NA), na.rm = TRUE)
+do.call(mean, args)
+
+
+aqi_df = do.call(rbind, aqi)
+```
+
+How can we convert multiple columns to a different class?
+```{r}
+#factor(aqi_df$Source)
+
+cols = c("Source", "Site.Name")
+aqi_df[cols] = lapply(aqi_df[cols], factor)
+
+str(aqi_df)
+```
+
+
+Are there any missing values in the columns?
+```{r}
+colSums(sapply(aqi_df, is.na))
+```
+
+How can we compute summary statistics about the numeric columns?
+```{r}
+is_numeric = sapply(aqi_df, is.numeric)
+sapply(aqi_df[is_numeric], mean)
+```
+
+
+
+
+
+
+
+
+
+
+
+The Split-Apply Strategy
+========================
+
+The `split()` function splits a vector or data frame into groups based on some
+other vector (usually congruent).
+
+```{r}
+x = c(1, 7, 9, 2, 5)
+group = c("blue", "red", "blue", "green", "red")
+
+split(x, group)
+```
+
+
+Split weight of dogs by the group column:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+
+by_group = split(dogs, dogs$group)
+```
+
+The `split()` function is especially useful when combined with `lapply()` or
+`sapply`().
+
+```{r}
+price_by_group = split(dogs$price, dogs$group)
+sapply(price_by_group, mean, na.rm = TRUE)
+
+sapply(price_by_group, sd, na.rm = TRUE)
+
+
+weight_by_size = split(dogs$weight, dogs$size)
+sapply(weight_by_size, mean, na.rm = TRUE)
+```
+This is an R idiom!
+
+
+
+The `tapply()` Function
+---------------------
+
+The `tapply()` function is equivalent to the `split()` and `sapply()` idiom.
+
+"t" for **table**, because `tapply()` is a generalization of the
+frequency-counting function `table()`.
+
+
+Examples:
+```{r}
+tapply(dogs$weight, dogs$size, mean, na.rm = TRUE)
+
+# A generalization of table:
+tapply(dogs$size, dogs$size, length)
+table(dogs$size)
+```
+
+This strategy is important for analyzing tabular data regardless of what
+programming language or packages you're using.
+
+
+
+
+Split-Apply and dplyr
+=====================
+
+We'll use the dogs data here:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+```
+
+The split-apply strategy is often used to compute grouped statistics.
+
+For example, we can compute the mean weight of the dogs by group:
+```{r}
+by_group = split(dogs$weight, dogs$group)
+sapply(by_group, mean, na.rm = TRUE)
+
+result = tapply(dogs$weight, dogs$group, mean, na.rm = TRUE)
+
+class(result)
+dim(result)
+result
+```
+
+The `aggregate` function does the same thing as `tapply`, but returns a data
+frame:
+```{r}
+result = aggregate(dogs$weight, dogs["group"], mean, na.rm = TRUE)
+class(result)
+result
+```
+
+The dplyr `group_by` and `summarize` functions are another form of split-apply:
+```{r}
+library(dplyr)
+
+# by_group = split(dogs$weight, dogs$group)
+# sapply(by_group, mean, na.rm = TRUE)
+
+by_group = group_by(dogs, group)
+summarize(by_group, mean(weight, na.rm = TRUE))
+```
+
+
+
+
+
+
+
+
+Choosing an Apply Function
+==========================
+
+
+1. Is the function you want to apply vectorized?
+
+   If yes, use vectorization.
+
+   Otherwise, continue to #2.
+
+
+2. Do you want to apply the function to elements or to groups?
+
+   For elements, continue to #3.
+
+   For groups, use the split-apply pattern. Use `split()`, then
+   continue to #3 to choose an apply function.
+
+   Note `tapply()` is equivalent to `split()` and `sapply()`.
+
+
+3. Will the function return the same data type for each element?
+
+   If yes, continue to #4.
+
+   Otherwise, use `lapply()`.
+
+
+4. Are you working interactively?
+
+   If yes, use `sapply()`.
+
+   Otherwise, use `vapply()`.
+
+
+Other Apply Functions
+---------------------
+
+See this StackOverflow Post for a summary:
+
+    https://stackoverflow.com/a/7141669
+
+
+The purrr and dplyr packages provide Tidyverse alternatives to apply functions.
+
+
+
+
+
+
+
+Conditional Expressions
+=======================
+
+Sometimes you'll need code to do different things, depending on a condition.
+
+_If-statements_ provide a way to write conditional code.
+
+
+For example, suppose we want to greet one person differently from the others:
+```{r}
+name = "Nick"
+#name = "Susan"
+
+if (name == "Nick") {
+   # If name is Nick:
+   message("We went down the TRUE branch")
+   msg = "Hi Nick, nice to see you again!"
+} else {
+   # Anything else:
+   msg = "Nice to meet you!"
+}
+```
+
+Indent code inside of the if-statement by 2 or 4 spaces.
+
+Indentation makes your code easier to read.
+
+
+
+The condition has to be a scalar:
+```{r}
+name = c("Nick", "Susan")
+
+if (name == "Nick") {
+   msg = "Hi Nick!"
+} else {
+   msg = "Nice to meet you!"
+}
+```
+
+You can chain together if-statements:
+```{r}
+#name = "Peter"
+name = "Susan"
+
+if (name == "Nick") {
+   msg = "Hi Nick, nice to see you again!"
+} else if (name == "Peter") {
+   msg = "Go away Peter, I'm busy!"
+} else {
+   msg = "Nice to meet you!"
+}
+msg
+```
+
+If-statements return the value of the last expression in the evaluated block:
+```{r}
+#name = "Nick"
+name = "Tom"
+
+msg = if (name == "Nick") {
+   "Hi Nick, nice to see you again!"
+} else {
+   "Nice to meet you!"
+}
+msg
+```
+
+Curly braces `{ }` are optional for single-line expressions:
+```{r}
+name = "Nick"
+
+msg = if (name == "Nick") "Hi Nick, nice to see you again!" else
+   "Nice to meet you!"
+
+msg
+```
+
+But you have to be careful if you don't use them:
+```{r}
+# NO GOOD:
+msg = if (name == "Nick")
+   "Hi Nick, nice to see you again!"
+else
+   "Nice to meet you!"
+```
+
+The `else` block is optional:
+```{r}
+msg = "Hi"
+name = "Tom"
+
+if (name == "Nick")
+   msg = "Hi Nick, nice to see you again!"
+
+msg
+```
+
+When there's no `else` block, the value of the `else` block is `NULL`:
+```{r}
+name = "Tom"
+
+msg = if (name == "Nick")
+   "Hi Nick, nice to see you again!"
+
+msg
+```
+
+
+
+
+
+
+The Congruent Vectors Strategy
+==============================
+
+If-statements don't work well with vectors.
+
+For example, suppose we want to transform a vector `x` so that:
+
+* Negative elements are set to 0.
+* Positive elements are squared.
+
+Using an if-statement doesn't work for this:
+```{r}
+x = c(-4, 5, 10, -3, 2, 1)
+
+# NO GOOD:
+if (x < 0)
+   x = 0
+```
+
+
+Instead, use congruent vectors:
+
+1. An input vector (or vectors) to use in conditions.
+
+2. An output vector to store the results.
+
+Use the input vector to conditionally assign elements to the output vector.
+
+
+So:
+```{r}
+output = x
+
+output[x < 0] = 0
+output[x > 0] = x[x > 0]^2
+output
+```
+
+
+Another example:
+```{r}
+y = c(4, 5, 6, 10, -1, 2)
+color = c("blue", "red", "blue", "green", "red", "red")
+
+# Say we want to:
+# red -> square
+# blue -> cube
+# green -> 0
+
+output = numeric(length(y))
+output[color == "red"] = y[color == "red"]^2
+output[color == "blue"] = y[color == "blue"]^3
+output[color == "green"] = 0
+output
+```
+
+
+The `ifelse()` Function
+-----------------------
+
+R also has a vectorized `ifelse()` function.
+
+For example:
+```{r}
+x = c(-1, 10, 20, -3)
+
+ifelse(x < 0, 0, x)
+```
+
+The `ifelse()` function is less efficient than a regular if-statement or the
+congruent vectors strategy.
