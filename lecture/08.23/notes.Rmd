@@ -1,0 +1,242 @@
+---
+title: "Stat 33A - Lecture Notes 1"
+date: August 23, 2020
+output: pdf_document
+---
+
+The R Interface
+===============
+
+You can interact with and control R by typing code into the prompt.
+
+
+The R prompt is a Read-Eval-Print Loop (__REPL__):
+
+1. R waits for you to type in some code and press `Enter`.
+2. R reads the code.
+3. R __evaluates__ the code to compute a result.
+4. R prints the result in the console.
+5. R loops back around to waiting for you to enter an expression.
+
+A single piece of code is called an __expression__.
+
+
+```{r}
+13 - 7
+```
+
+
+## Getting Help
+
+R has built-in help files.
+
+You can use the `?` command to get help with a specific function:
+```{r}
+?sin
+```
+The `?` command should be your first stop when you learn a new function.
+
+
+To get help with arithmetic commands, you must put the symbol in single or
+double quotes:
+```{r}
+?"+"
+```
+
+This works for ordinary functions as well:
+```{r}
+?"sin"
+```
+
+You can use the `??` command to search the help files:
+```{r}
+??"graphic"
+```
+
+
+## Order of Operations
+
+Arithmetic in R follows an __order of operations__, similar to the order of
+operations you probably learned in a math class.
+
+The order from first to last is:
+
+1. Parentheses `( )`
+2. Exponentiation `^`
+3. Multiplication `*` and Division `/`
+4. Addition `+` and Subtraction `-`
+
+Try this out in the R prompt to get a feel for it:
+```{r}
+5 * 6 - 3
+
+5 * (6 - 3)
+```
+
+R has many more operations besides the ones listed above.
+
+You can see R's complete order of operations with the command:
+```{r}
+?Syntax
+```
+We'll learn about some of these operations later on.
+
+
+
+
+
+
+
+
+Variables
+=========
+
+A __variable__ is a name for a value.
+
+Use `=` or `<-` to assign a value to a variable:
+```{r}
+x = 12
+
+y <- 16
+```
+Either is okay, but choose one and be consistent!
+
+The value can be the result of a computation:
+```{r}
+x = y
+
+x = 5 * 7 + 3
+
+x = x + 1
+```
+
+Variable names can contain letters or numbers, but can't begin with a number:
+```{r}
+hello14 = 5
+```
+
+With variables, you can:
+
+* Reuse the result of a computation
+* Write general expressions, such as `a*x + b`
+* Break code into small steps, so that it's easier to test and understand.
+
+```{r}
+6 * 7 + 3 - 18
+
+step1 = 6 * 7
+step2 = step1 + 3 - 18
+```
+
+
+## Copy-on-Write
+
+In R, variables are __copy-on-write__.
+
+That is, if we assign `x` to `y`:
+```{r}
+x = 13
+y = x
+```
+
+And then change `x`:
+```{r}
+x = 16
+```
+
+Then `y` remains unchanged:
+```{r}
+y
+```
+
+Originally, `x` and `y` referred to the same value in memory.
+
+When we changed `x` (a "write"), R automatically copied the original value so
+that `y` remained the same.
+
+
+
+Calls
+=====
+
+A **function** is a reusable command that computes something.
+
+The idea is similar to the functions you probably learned about in math class.
+
+To compute the sine of 3, you can write:
+```{r}
+sin(3)
+
+cos(5)
+
+sum(1, 2, 3)
+```
+
+Code that uses a function is said to __call__ that function.
+
+The part of the code where the function is used is also called a __call__.
+
+
+R has many built in functions for doing math, statistics, and other computing
+tasks.
+```{r}
+log(3)
+
+sqrt(4)
+```
+
+## Parameters
+
+A function's inputs are called __parameters__.
+
+Parameters are listed in each function's help file:
+```{r}
+?sum
+
+?log
+```
+
+## Arguments
+
+When you call a function, the values you assign as input are called
+__arguments__.
+
+Some functions accept exactly one argument:
+```{r}
+length(4)
+
+sin(4)
+```
+
+Some functions do not require any arguments at all:
+```{r}
+sessionInfo()
+```
+
+Some functions accept multiple arguments:
+```{r}
+log(10, 2)
+
+log(10)
+```
+
+Some functions accept any number of arguments:
+```{r}
+sum(5, 4, 1)
+
+c(1, 2, 3)
+```
+
+You can set arguments based on the order of the parameters:
+```{r}
+log(10, 2)
+```
+
+Or by using the names of the parameters:
+```{r}
+log(base = 2, x = 10)
+
+log(base = 2, 10)
+```
+
+A function has parameters; a call has arguments!
