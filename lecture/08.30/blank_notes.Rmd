@@ -1,0 +1,236 @@
+---
+title: "Stat 33A - Lecture Notes 2"
+date: August 30, 2020
+output: pdf_document
+---
+
+Packages & Notebooks
+====================
+
+A __package__ is collection of functions and/or data for use in R.
+
+The Comprehensive R Archive Network (__CRAN__) stores most user-contributed
+packages.
+
+
+You can install packages from CRAN with `install.packages()`.
+
+For example:
+```{r}
+
+```
+
+A package only needs to be installed once.
+
+For maintaining your packages, there are also the functions:
+
+* `installed.packages()` to list installed packages
+* `remove.packages()` to remove a package
+* `update.packages()` to update ALL packages
+
+
+## Loading Packages
+
+The `library()` function loads an installed package:
+```{r}
+
+```
+
+Only load the packages you actually need.
+
+You'll have to reload the packages each time you restart R.
+
+
+## Notebooks
+
+Two typical ways to save R code:
+
+* R script (.R file)
+* R notebook (.Rmd file)
+
+R scripts are simpler:
+
+* No extra packages required
+* Ideal for developing software
+
+R notebooks are richer:
+
+* Can store formatted text and code
+* Can be converted to HTML, DOCX, and PDF
+* Ideal for data analyses and presentations
+
+R notebooks require the `rmarkdown` package:
+```{r, eval=FALSE}
+install.packages("rmarkdown")
+```
+
+Generating a report from an R notebook is called __knitting__.
+
+
+## TinyTeX
+
+If you want to knit PDFs from R notebooks, you also need LaTeX.
+
+LaTeX is programming language for typesetting books.
+
+The `tinytex` package aims to make installing LaTeX easy.
+
+First, install `tinytex`:
+```{r, eval=FALSE}
+install.packages("tinytex")
+```
+
+Second, tell `tinytex` to install LaTeX:
+```{r, eval=FALSE}
+library(tinytex)
+install_tinytex()
+```
+This may take a while, and you may need administrator permissions.
+
+Finally, restart R and try knitting an R notebook.
+
+Remember that the output type must be `pdf_document`.
+
+
+
+Vectors
+=======
+
+A __vector__ is an ordered collection of values.
+
+Each value in a vector is called an __element__.
+
+
+The `c()` function combines vectors:
+```{r}
+
+```
+
+The elements of a vector must have the same data type:
+```{r}
+
+```
+
+
+An __empty vector__ is a vector with 0 elements:
+```{r}
+
+```
+
+
+The `length()` function returns the length of an object:
+```{r}
+
+```
+
+
+Vectors are the fundamental or _atomic_ data structure in R.
+
+
+## Vectorization
+
+What happens if we call a math function on a vector?
+```{r}
+
+```
+
+A __vectorized__ function is one that is applied element-by-element.
+
+Most of R's math functions are vectorized.
+
+
+There are a few functions that are NOT vectorized:
+```{r}
+
+```
+For these, the entire vector is consumed.
+
+
+Vectorization is the fastest way to do repetitive computations:
+```{r}
+
+```
+
+
+## Recycling
+
+The arithmetic operators are vectorized:
+```{r}
+
+```
+
+If you pass vectors with different lengths, the shorter one will be
+__recycled__:
+```{r}
+
+```
+
+Recycling is most useful when the length of one argument is a multiple of the
+other.
+
+Especially when one argument has length 1:
+```{r}
+
+```
+
+
+
+Subsets of Vectors
+==================
+
+Recall: a __vector__ is an ordered collection of values.
+
+
+Sometimes you'll want to work with specific elements of a vector.
+
+
+The elements are ordered, so they have positions:
+```{r}
+
+```
+
+In R, the positions are numbered starting from 1.
+
+These numbers are called __indices__ or __subscripts__ of the vector.
+
+
+You can get an element with `[`, the subset operator:
+```{r}
+
+```
+
+
+You can get multiple elements at once by passing a vector of indices:
+```{r}
+
+```
+
+Repeated indices mean repeated elements:
+```{r}
+
+```
+
+
+## Negative Indices
+
+A negative index means all elements except the one at that index:
+```{r}
+
+```
+
+Mixing positive and negative indices is not allowed:
+```{r}
+
+```
+
+
+## Copy-on-write, Part 2
+
+The copy-on-write rule applies to vectors.
+
+For example:
+```{r}
+
+```
+
+
