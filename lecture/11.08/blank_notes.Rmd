@@ -1,0 +1,227 @@
+---
+title: "Stat 33A - Lecture Notes 12"
+date: Nov 8, 2020
+output: pdf_document
+---
+
+
+While-loops
+===========
+
+A while-loop runs a block of code repeatedly while some condition is `TRUE`.
+
+The condition is checked before each iteration.
+
+For example, suppose you want to add up numbers from 0 to 50, but stop as soon
+as the total is greater than 50:
+```{r}
+
+```
+
+Use a while-loop when you don't know how many iterations are needed until after
+the loop runs.
+
+
+While-loops are a generalization of for-loops.
+
+That means you can write a for-loop as a while-loop:
+```{r}
+
+```
+But generally you shouldn't do this!
+
+
+
+Developing Iterative Code
+=========================
+
+See the slides.
+
+
+When thinking about writing a loop, try (in order):
+
+1. vectorization
+2. apply functions
+    * Try an apply function if iterations are independent.
+3. for/while-loops
+    * Try a for-loop if some iterations depend on others.
+    * Try a while-loop if the number of iterations is unknown.
+4. recursion
+    * Convenient for naturally recursive problems (like Fibonacci),
+      but often there are faster solutions.
+
+
+Before you write the loop, try writing the code for just 1 iteration.
+
+Make sure that code works; it's easy to test code for 1 iteration.
+
+When you have 1 iteration working, then try using the code in a loop
+(you will have to make some small changes).
+
+If your loop doesn't work, try to figure out which iteration is
+causing the problem. One way to do this is to use message() to print
+out information.
+
+Then try to write the code for the broken iteration, get that
+iteration working, and repeat this whole process.
+
+
+
+Messages, Warnings, and Errors
+==============================
+
+The `message`, `warning`, and `stop` functions form R's _condition system_.
+
+The condition system provides a way to report and handle unusual conditions.
+
+
+
+The `message` function prints message to the R console:
+```{r}
+
+```
+
+
+The `warning` function prints a warning:
+```{r}
+
+```
+
+By default, calling `warning` in a function prints the name of the function:
+```{r}
+
+```
+
+You can use the `call.` parameter to control this:
+```{r}
+
+```
+
+
+The `stop` function prints an error message and stops evaluation:
+```{r}
+
+```
+The `stop` function also has a `call.` parameter.
+
+
+
+Preventing Bugs
+===============
+
+Modularity
+----------
+
+Try to break problems into smaller steps.
+
+Write down the input(s) and output(s) for each step.
+
+Create functions for steps that are reusable. Use parameters for input and the
+return value for output.
+
+Be wary of extremely short (1 line) or long (> 20 line) functions. Often a sign
+of failure to break down the problem.
+
+
+
+Code Clarity
+------------
+
+Format your code so that it's easy to read:
+
+* Use whitespace:
+
+    + Put spaces after commas and around binary operators.
+    + Indent code inside curly braces `{ }` by 2 spaces or 1 tab.
+    + Don't mix tabs and spaces.
+    + Separate logical steps or "paragraphs" with blank lines.
+
+* Put closing curly braces `}` on their own line.
+    + Exception: use `} else {`
+
+* Use a consistent naming style:
+   + `lowercase_with_underscores`
+   + `camelCase`
+
+* Use descriptive variable names. Short names are okay for frequently-used
+  variables where the context makes the meaning apparent.
+
+* Use comments:
+    + To create a big picture plan for how to write your code.
+    + To explain tricky code.
+    + To summarize the purpose of a "paragraph" of code.
+    + To document how to use your functions. Also see roxygen2.
+
+
+Without formatting:
+```{r}
+f=function(x,xx){
+xx=match.arg(xx,c("celsius","fahrenheit"),several.ok=TRUE)
+x1=xx=="fahrenheit"
+x[x1]=(x[x1]-32)*5/9
+x+273.15}
+```
+
+With formatting:
+```{r}
+
+```
+
+Defensive Programming
+---------------------
+
+Test whether inputs satisfy your assumptions.
+
+For instance, if your function should only work on scalars, check the
+lengths of the arguments.
+
+Raise an error with `stop()` if the assumptions aren't satisfied.
+
+Useful functions for testing assumptions:
+
+* `is.X()` functions for testing various properties. For instance,
+  `is.character()` to test whether an object is a character vector.
+
+* `inherits()` for testing the class of an object.
+
+* `length()`, `dim()` for testing dimensions.
+
+
+
+The R Debugger
+==============
+
+Debugging code is the process of confirming, step-by-step, that what you belive
+the code does is what the code actually does.
+
+The key idea is to check each step of the code.
+
+Two strategies:
+
+* Work forward through the code from the beginning.
+* Work backward from the source of an error.
+
+R has built-in functions to help with debugging.
+
+The `browser()` function pauses the running code and starts R's
+debugging system.
+
+For example:
+```{r}
+
+```
+
+The key debugger commands are:
+
+* `n` to run the next line
+* `s` to "step into" a call
+* `c` to continue running the code
+* `Q` to quit the debugger
+* `where` to print call stack
+* `help` to print debugger help
+
+
+Another example:
+```{r}
+
+```
