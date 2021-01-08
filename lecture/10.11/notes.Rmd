@@ -1,0 +1,395 @@
+---
+title: "Stat 33A - Lecture Notes 8"
+date: Oct 11, 2020
+output: pdf_document
+---
+
+
+dplyr Overview
+==============
+
+See the slides.
+
+
+Subsets with dplyr
+==================
+
+The `dplyr` package provides functions for taking subsets.
+
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+```
+
+
+Use `slice()` to choose rows by position:
+```{r}
+# install.packages("dplyr")
+
+library(dplyr)
+
+slice(dogs, 1)
+
+slice(dogs, 3)
+```
+
+
+Use `select()` to choose columns by name or position:
+```{r}
+select(dogs, 1)
+
+select(dogs, c(1, 2, 3))
+
+select(dogs, breed)
+
+select(dogs, breed, weight, height)
+
+select(dogs, c(breed, weight, height))
+```
+In dplyr, column names are NOT quoted (like ggplot2, unlike base R).
+
+
+
+Use `:` to indicate a range of rows or columns:
+```{r}
+select(dogs, 1:3)
+
+slice(dogs, 3:13)
+```
+
+In dplyr, you can use `:` with names (unlike base R):
+```{r}
+select(dogs, popularity:price)
+```
+
+
+Use `-` to exclude rows or columns:
+```{r}
+select(dogs, -1)
+
+select(dogs, -2)
+```
+
+In dplyr, you can use `-` with names (unlike base R):
+```{r}
+select(dogs, -datadog)
+
+select(dogs, -datadog, -group)
+```
+
+
+Subsets by Condition
+--------------------
+
+Use `filter()` to choose rows that satisfy a condition:
+```{r}
+filter(dogs, weight > 10)
+
+filter(dogs, popularity_all <= 10)
+
+filter(dogs, popularity_all <= 10 & price < 1000)
+
+filter(dogs, kids == "medium" | kids == "high")
+```
+
+If you pass multiple conditions to `filter()`, they're combined with the AND
+operator `&`:
+```{r}
+filter(dogs, popularity_all <= 10, price < 1000)
+```
+
+
+Unique Rows
+-----------
+
+Use `distinct()` to remove duplicate rows:
+```{r}
+df = data.frame(x = c(1, 1, 3), y = c(1, 1, 4))
+df
+
+distinct(df)
+```
+
+
+
+Base R versus dplyr
+===================
+
+Compared to dplyr, R's built-in functions are more general.
+
+They work with data frames, lists, vectors, and more.
+
+The dplyr functions only work with data frames.
+
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+```
+
+
+The base R equivalent of `slice()` is:
+```{r}
+library(dplyr)
+
+slice(dogs, 3)
+
+# Base R
+dogs[3, ]
+
+slice(dogs, 1:5)
+
+# Base R
+dogs[1:5, ]
+```
+
+The base R equivalent of `select()` is:
+```{r}
+select(dogs, 1)
+class(select(dogs, 1))
+
+# Base R
+dogs[1]
+class(dogs[1])
+
+# Slightly different, not equivalent:
+dogs[, 1]
+class(dogs[, 1])
+
+
+select(dogs, datadog)
+
+# Base R
+dogs["datadog"]
+
+# Slightly different, not equivalent:
+dogs[, "datadog"]
+dogs$datadog
+
+
+select(dogs, -breed)
+
+# Base R
+dogs[-"breed"]
+
+dogs[-1]
+```
+
+What if we want all except a specific named column?
+
+The `match()` function returns the position of the first match for its first
+argument in its second argument:
+```{r}
+match(3, c(4, 3, 6, 2, 3))
+
+match("breed", names(dogs))
+
+match(10, c(4, 3, 6, 2, 3))
+```
+
+You can use `match()` to exclude a a named column:
+```{r}
+dogs[-match("breed", names(dogs))]
+
+#dogs[-match("google", names(dogs))]
+```
+
+
+Subset by Condition
+-------------------
+
+The base R equivalent of `filter()` is:
+```{r}
+filter(dogs, weight > 20 & price < 1000)
+
+# Base R
+subset(dogs, weight > 20 & price < 1000)
+
+# Slightly different, not equivalent:
+dogs[dogs$weight > 20, ]
+```
+
+
+Unique Rows
+-----------
+
+What if we want to remove duplicate rows?
+```{r}
+df = data.frame(x = c(1, 1, 1, 3), y = c(1, 1, 2, 7))
+df
+
+distinct(df)
+```
+
+The `duplicated()` function returns `TRUE` for duplicated elements/rows:
+```{r}
+duplicated(c(1, 1, 2, 1, 3))
+```
+
+You can use `duplicated()` to remove duplicated rows:
+```{r}
+duplicated(df)
+
+df[!duplicated(df), ]
+```
+
+
+
+
+Transformations with dplyr
+==========================
+
+Besides taking subsets, you can also use dplyr to transform data.
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+```
+
+
+Use `mutate()` to create a new column:
+```{r}
+library(dplyr)
+
+dogs = mutate(dogs, hwratio = height / weight)
+```
+
+You can can do this with base R as well:
+```{r}
+dogs$hwratio = dogs$height / dogs$weight
+dogs
+```
+
+
+Use `arrange()` to sort a data frame:
+```{r}
+arrange(dogs, weight)
+
+arrange(dogs, desc(weight), height)
+```
+
+Again, this is something you can also do with base R:
+```{r}
+ord = order(dogs$weight, dogs$height)
+dogs[ord, ]
+```
+
+
+Aggregation
+-----------
+
+_Aggregation_ means reducing data down to a smaller or simpler result.
+
+Point statistics are all examples of aggregation:
+
+* Frequency
+* Mean
+* Median
+* Standard deviation
+
+Use the `summarize()` function to compute an aggregate:
+```{r}
+summarize(dogs, mean(weight, na.rm = TRUE))
+
+summarize(dogs, sd(price, na.rm = TRUE))
+
+# Base R
+mean(dogs$weight, na.rm = TRUE)
+```
+
+
+Groups
+------
+
+It's often useful to split data into groups, then aggregate each group.
+
+For example, we might want to compute group means or group frequencies.
+
+Use the `group_by()` function to split data into groups:
+```{r}
+group_by(dogs, group)
+```
+
+You'll almost always use `group_by()` together with `summarize()`:
+```{r}
+by_group = group_by(dogs, group)
+summarize(by_group, mean(weight, na.rm = TRUE))
+
+summarize(group_by(dogs, kids), median(price, na.rm = TRUE))
+```
+
+
+You can use `group_by()` with multiple categorical features:
+```{r}
+groups = group_by(dogs, kids, grooming)
+summarize(groups, max(price, na.rm = TRUE))
+```
+
+The `count()` function is a shortcut for computing frequencies:
+```{r}
+count(dogs, group)
+
+summarize(group_by(dogs, group), n())
+```
+
+You can count in base R with `table()`:
+```{r}
+table(dogs$group)
+```
+
+Later on, we'll learn about how to do the equivalent of `group_by()` and
+`summarize()` in base R.
+
+
+
+
+The Pipe Operator
+=================
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+```
+
+Computations that involve multiple steps can be hard to read:
+```{r}
+library(dplyr)
+
+nrow(filter(dogs, weight < 20))
+
+nrow(filter(dogs, weight < median(dogs$weight, na.rm = TRUE)))
+```
+
+As we add more steps, the problem gets worse.
+
+One solution is to use variables:
+```{r}
+dogs_below = filter(dogs, weight < 20)
+nrow(dogs_below)
+```
+
+dplyr provides an alternative solution: the pipe operator `%>%`.
+
+The idea is that:
+```
+g(x) %>% f
+```
+Is transformed into:
+```
+f(g(x))
+```
+
+So you can write compound expressions left-to-right:
+```{r}
+# nrow(filter(dogs, weight < 20))
+
+filter(dogs, weight < 20) %>% nrow
+```
+
+By default, the left-hand side becomes the first argument of the right-hand
+side.
+
+
+Technical note: the pipe is provided by the magrittr package, which is
+installed/loaded when you install/load dplyr.

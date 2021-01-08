@@ -1,0 +1,288 @@
+---
+title: "Stat 33A - Lecture Notes 8"
+date: Oct 11, 2020
+output: pdf_document
+---
+
+
+dplyr Overview
+==============
+
+See the slides.
+
+
+Subsets with dplyr
+==================
+
+The `dplyr` package provides functions for taking subsets.
+
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+
+```
+
+
+Use `slice()` to choose rows by position:
+```{r}
+
+```
+
+
+Use `select()` to choose columns by name or position:
+```{r}
+
+```
+In dplyr, column names are NOT quoted (like ggplot2, unlike base R).
+
+
+
+Use `:` to indicate a range of rows or columns:
+```{r}
+
+```
+
+In dplyr, you can use `:` with names (unlike base R):
+```{r}
+
+```
+
+
+Use `-` to exclude rows or columns:
+```{r}
+
+```
+
+In dplyr, you can use `-` with names (unlike base R):
+```{r}
+
+```
+
+
+Subsets by Condition
+--------------------
+
+Use `filter()` to choose rows that satisfy a condition:
+```{r}
+
+```
+
+If you pass multiple conditions to `filter()`, they're combined with the AND
+operator `&`:
+```{r}
+
+```
+
+
+Unique Rows
+-----------
+
+Use `distinct()` to remove duplicate rows:
+```{r}
+
+```
+
+
+
+Base R versus dplyr
+===================
+
+Compared to dplyr, R's built-in functions are more general.
+
+They work with data frames, lists, vectors, and more.
+
+The dplyr functions only work with data frames.
+
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+
+```
+
+
+The base R equivalent of `slice()` is:
+```{r}
+
+```
+
+The base R equivalent of `select()` is:
+```{r}
+
+```
+
+What if we want all except a specific named column?
+
+The `match()` function returns the position of the first match for its first
+argument in its second argument:
+```{r}
+
+```
+
+You can use `match()` to exclude a a named column:
+```{r}
+
+```
+
+
+Subset by Condition
+-------------------
+
+The base R equivalent of `filter()` is:
+```{r}
+
+```
+
+
+Unique Rows
+-----------
+
+What if we want to remove duplicate rows?
+```{r}
+
+```
+
+The `duplicated()` function returns `TRUE` for duplicated elements/rows:
+```{r}
+
+```
+
+You can use `duplicated()` to remove duplicated rows:
+```{r}
+
+```
+
+
+
+
+Transformations with dplyr
+==========================
+
+Besides taking subsets, you can also use dplyr to transform data.
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+
+```
+
+
+Use `mutate()` to create a new column:
+```{r}
+
+```
+
+You can can do this with base R as well:
+```{r}
+
+```
+
+
+Use `arrange()` to sort a data frame:
+```{r}
+
+```
+
+Again, this is something you can also do with base R:
+```{r}
+
+```
+
+
+Aggregation
+-----------
+
+_Aggregation_ means reducing data down to a smaller or simpler result.
+
+Point statistics are all examples of aggregation:
+
+* Frequency
+* Mean
+* Median
+* Standard deviation
+
+Use the `summarize()` function to compute an aggregate:
+```{r}
+
+```
+
+
+Groups
+------
+
+It's often useful to split data into groups, then aggregate each group.
+
+For example, we might want to compute group means or group frequencies.
+
+Use the `group_by()` function to split data into groups:
+```{r}
+
+```
+
+You'll almost always use `group_by()` together with `summarize()`:
+```{r}
+
+```
+
+
+You can use `group_by()` with multiple categorical features:
+```{r}
+
+```
+
+The `count()` function is a shortcut for computing frequencies:
+```{r}
+
+```
+
+You can count in base R with `table()`:
+```{r}
+
+```
+
+Later on, we'll learn about how to do the equivalent of `group_by()` and
+`summarize()` in base R.
+
+
+
+
+The Pipe Operator
+=================
+
+We'll use the dogs data (`dogs.rds` on the bCourse) for examples:
+```{r}
+
+```
+
+Computations that involve multiple steps can be hard to read:
+```{r}
+
+```
+
+As we add more steps, the problem gets worse.
+
+One solution is to use variables:
+```{r}
+
+```
+
+dplyr provides an alternative solution: the pipe operator `%>%`.
+
+The idea is that:
+```
+g(x) %>% f
+```
+Is transformed into:
+```
+f(g(x))
+```
+
+So you can write compound expressions left-to-right:
+```{r}
+
+```
+
+By default, the left-hand side becomes the first argument of the right-hand
+side.
+
+
+Technical note: the pipe is provided by the magrittr package, which is
+installed/loaded when you install/load dplyr.
