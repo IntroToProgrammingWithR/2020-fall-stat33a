@@ -1,0 +1,270 @@
+---
+title: "Stat 33A - Lecture Notes 7"
+date: Oct 4, 2020
+output: pdf_document
+---
+
+
+Exploratory Data Analysis
+=========================
+
+What does it mean to "explore" data?
+
+* Look for patterns (examine variation in the data)
+* Look for errors in the data
+* Look for relationships between variables
+* Look at data to get an overview (what data are present?)
+* Check assumptions (model, conclusions, etc)
+
+What are the techniques to "explore" data?
+
+* Make plots
+* Compute summary statistics
+* Fit models (including hypothesis tests, machine learning)
+
+
+The table below has _suggestions_ for choosing an appropriate plot
+based on the data types.
+
+You also need to think about what you're trying to convey.
+
+First Feature  | Second Feature   | Plot
+-------------- | ---------------- | ----
+categorical    |                  | bar, dot
+categorical    | categorical      | bar, dot, mosaic
+numerical      |                  | box, density, histogram
+numerical      | categorical      | box, density
+numerical      | numerical        | line, scatter, smooth scatter
+
+
+Again we'll use the dogs data:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+```
+
+Example: How many dogs are there in each group (toy, sporting, etc)?
+
+```{r}
+library(ggplot2)
+
+ggplot(dogs, aes(x = group)) + geom_bar()
+```
+
+Example: What's the distribution of datadog scores?
+
+```{r}
+ggplot(dogs, aes(x = datadog)) + geom_density()
+```
+
+Example: How are size and height related?
+
+```{r}
+ggplot(dogs, aes(x = height, fill = size)) + geom_boxplot()
+```
+
+
+
+
+
+
+
+
+Distribution Plots
+==================
+
+For numeric features, we typically use box, histogram, or density plots.
+
+
+Example: How does height vary for different groups of dogs?
+
+What can we do to display these?
+  * side-by-side box plots
+  * overlapping density plots
+
+
+Let's start with a box plot:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+
+library(ggplot2)
+
+ggplot(dogs, aes(x = height, fill = group)) + geom_boxplot()
+```
+
+
+How can we display the groups in a density plot?
+```{r}
+ggplot(dogs, aes(height, color = group)) + geom_density()
+```
+
+Too many lines!
+
+You can use a ridge plot instead to show many densities at once:
+```{r}
+# install.packages("ggridges")
+
+library(ggridges)
+
+ggplot(dogs, aes(x = height, y = group)) + geom_density_ridges()
+```
+
+
+
+
+
+
+
+
+
+
+
+Faceted Plots
+=============
+
+Side-by-side plots are called _faceted_ plots.
+
+Can we make the group vs height dogs plot using faceted plots?
+
+
+The `facet_wrap()` function lays out facets in rows (to use screen space
+efficiently).
+
+The syntax is:
+```
+facet_wrap(vars(FEATURE))
+```
+
+
+For example:
+```{r}
+dogs = readRDS("data/dogs/dogs.rds")
+
+library(ggplot2)
+
+ggplot(dogs, aes(height)) + geom_density() + facet_wrap(vars(group))
+```
+
+
+The `facet_grid()` function lays out facets in a grid. The syntax is:
+```
+facet_grid(ROWS ~ COLUMNS)
+```
+Use `.` as a placeholder if you only want one feature.
+
+
+For example:
+```{r}
+ggplot(dogs, aes(height)) + geom_density() + facet_grid(size ~ kids)
+```
+
+
+When should you use facets versus aesthetics?
+
+Use facets when aesthetics would put too much information on the plot (too many
+lines, too many points, etc).
+
+Use aesthetics when there is less information to show; facets tend to use space
+less efficiently than aesthetics.
+
+Overall, think about the reader. There is no rule that always holds here.
+
+
+
+
+
+
+
+
+EDA Strategy
+============
+
+See the lecture slides.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EDA Examples
+============
+
+```{r}
+apt = readRDS("data/craigslist/public/2020.10_cl_apartments.rds")
+```
+
+How are the prices distributed?
+
+```{r}
+library(ggplot2)
+
+ggplot(apt, aes(price)) + geom_density()
+```
+
+What cities are in this data set?
+
+```{r}
+names(apt)
+
+class(apt$city)
+
+levels(apt$city)
+```
+
+How are prices distributed in Berkeley, Oakland, San Francisco?
+
+```{r}
+cities = c("Berkeley", "Oakland", "San Francisco")
+city_apt = apt[apt$city %in% cities, ]
+
+city_apt$city = droplevels(city_apt$city)
+
+table(city_apt$city, useNA = "always")
+
+ggplot(city_apt, aes(price, color = city)) + geom_density()
+```
+
+
+How many ads for different numbers of bedrooms in each city?
+
+```{r}
+names(city_apt)
+
+summary(city_apt$bedrooms)
+
+table(city_apt$bedrooms, city_apt$city)
+
+prop.table(table(city_apt$bedrooms, city_apt$city), 2)
+```
+
+Plotting the frequencies:
+```{r}
+ggplot(city_apt, aes(bedrooms, fill = city)) + geom_bar(position = "dodge2")
+```
+
+
+To plot the proportions, use the special `..prop..` column (computed by ggplot2) for the y aesthetic:
+```{r}
+ggplot(city_apt, aes(bedrooms, y = ..prop.., fill = city)) +
+  geom_bar(position = "dodge2")
+```

@@ -1,0 +1,156 @@
+---
+title: "Stat 33A - Lecture Notes 7"
+date: Oct 4, 2020
+output: pdf_document
+---
+
+
+Exploratory Data Analysis
+=========================
+
+What does it mean to "explore" data?
+
+* Look for patterns (examine variation in the data)
+* Look for errors in the data
+* Look for relationships between variables
+* Look at data to get an overview (what data are present?)
+* Check assumptions (model, conclusions, etc)
+
+What are the techniques to "explore" data?
+
+* Make plots
+* Compute summary statistics
+* Fit models (including hypothesis tests, machine learning)
+
+
+The table below has _suggestions_ for choosing an appropriate plot
+based on the data types.
+
+You also need to think about what you're trying to convey.
+
+First Feature  | Second Feature   | Plot
+-------------- | ---------------- | ----
+categorical    |                  | bar, dot
+categorical    | categorical      | bar, dot, mosaic
+numerical      |                  | box, density, histogram
+numerical      | categorical      | box, density
+numerical      | numerical        | line, scatter, smooth scatter
+
+
+Again we'll use the dogs data:
+```{r}
+
+```
+
+Example: How many dogs are there in each group (toy, sporting, etc)?
+
+```{r}
+
+```
+
+Example: What's the distribution of datadog scores?
+
+```{r}
+
+```
+
+Example: How are size and height related?
+
+```{r}
+
+```
+
+
+Distribution Plots
+==================
+
+For numeric features, we typically use box, histogram, or density plots.
+
+
+Example: How does height vary for different groups of dogs?
+
+What can we do to display these?
+  * side-by-side box plots
+  * overlapping density plots
+
+
+Let's start with a box plot:
+```{r}
+
+```
+
+
+How can we display the groups in a density plot?
+```{r}
+
+```
+
+Too many lines!
+
+You can use a ridge plot instead to show many densities at once:
+```{r}
+# install.packages("ggridges")
+
+```
+
+
+Faceted Plots
+=============
+
+Side-by-side plots are called _faceted_ plots.
+
+Can we make the group vs height dogs plot using faceted plots?
+
+
+The `facet_wrap()` function lays out facets in rows (to use screen space
+efficiently).
+
+The syntax is:
+```
+facet_wrap(vars(FEATURE))
+```
+
+
+For example:
+```{r}
+
+```
+
+
+The `facet_grid()` function lays out facets in a grid. The syntax is:
+```
+facet_grid(ROWS ~ COLUMNS)
+```
+Use `.` as a placeholder if you only want one feature.
+
+
+For example:
+```{r}
+
+```
+
+
+When should you use facets versus aesthetics?
+
+Use facets when aesthetics would put too much information on the plot (too many
+lines, too many points, etc).
+
+Use aesthetics when there is less information to show; facets tend to use space
+less efficiently than aesthetics.
+
+Overall, think about the reader. There is no rule that always holds here.
+
+
+EDA Strategy
+============
+
+See the lecture slides.
+
+
+
+EDA Examples
+============
+
+```{r}
+
+```
