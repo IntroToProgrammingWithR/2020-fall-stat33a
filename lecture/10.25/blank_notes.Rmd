@@ -1,0 +1,234 @@
+---
+title: "Stat 33A - Lecture Notes 10"
+date: Oct 25, 2020
+output: pdf_document
+---
+
+
+Functions
+=========
+
+A function is like a factory: raw materials (inputs) go in, products (outputs)
+come out.
+
+```
+         +-------+
+-- in -->|   f   |-- out -->
+         +-------+
+```
+
+
+For a function:
+
+* _Parameters_ are placeholder variables for inputs.
+    + _Arguments_ are actual values assigned to the parameters in a call.
+* The _return value_ is the output.
+* The _body_ is the code inside.
+
+
+
+You can write your own function with the `function` command.
+
+The syntax is:
+```
+function(parameter1, parameter2, ...) {
+  # Your code goes here
+  
+  # The result on the last line is automatically returned
+}
+```
+
+For example, let's make a function that detects negative numbers:
+```{r}
+
+```
+
+Generally, you should:
+
+* Assign the function to a variable.
+    + Exception: _anonymous functions_ in calls to apply functions
+    + Functions are actions, so use a verb in the name.
+
+* Indent the body of the function by 2 or 4 spaces.
+
+
+As another example, let's make a function that detects leap years:
+```{r}
+
+```
+
+Curly braces are optional if the body is only one line:
+```{r}
+
+```
+
+To exit the function and return a result early, use `return()`.
+
+It only makes sense to use `return()` inside an if-statement!
+
+For example, suppose we want to return `NA` if the argument isn't a number:
+```{r}
+
+```
+It's idiomatic to only use `return()` when strictly necessary.
+
+
+
+To return multiple values, use a vector or list.
+
+For example, let's make a function that computes the mean and median for a
+vector:
+```{r}
+
+```
+
+
+
+
+
+
+Default Arguments
+=================
+
+Parameters can have default arguments that are used if no argument is provided.
+
+Use `=` (not `<-`) to assign default arguments:
+```{r}
+
+```
+
+
+Function Example
+================
+
+
+
+Variables: Scope & Lookup
+=======================
+
+Local Variables
+---------------
+
+A variable's *scope* is the section of code where it exists and is accessible.
+
+The `exists()` function checks whether a variable is in scope:
+```{r}
+
+```
+
+When you create a function, you create a new scope.
+
+Variables defined inside of a function are *local* to the function.
+
+
+Local variables cannot be accessed from outside:
+```{r}
+
+```
+
+Local variables are reset each time the function is called:
+```{r}
+
+```
+
+
+The `local()` function also creates a new scope:
+```{r}
+
+```
+Rarely used in practice.
+
+
+
+Lexical Scoping
+---------------
+
+A function can use variables defined outside (non-local), but only if those
+variables are in scope where the function was **defined**.
+
+This property is called *lexical scoping*.
+
+For example:
+```{r}
+
+```
+
+Variables defined directly in the R console are *global* and available to any
+function.
+
+
+Local variables *mask* (hide) non-local variables with the same name:
+```{r}
+
+```
+
+
+ONE EXCEPTION!
+
+We often call variables:
+```{r}
+
+```
+
+In this case, the variable must refer to a function, so R ignores local
+variables that aren't.
+
+For example:
+```{r}
+
+```
+
+
+Dynamic Lookup
+--------------
+
+Variable lookup happens when a function is **called**, not when it's defined.
+
+This is called *dynamic lookup*.
+
+For example:
+```{r}
+
+```
+
+
+Summary
+-------
+
+* Function definitions (or `local()`) create a new scope.
+
+* Local variables
+    + Are private
+    + Get reset for each call
+    + Mask non-local variables (exception: function calls)
+
+* *Lexical scoping*: where a function is **defined** determines which non-local
+  variables are in scope.
+
+* *Dynamic lookup*: when a function is **called** determines values of
+  non-local variables.
+
+
+
+Using Functions
+===============
+
+Functions are the building blocks for solving problems.
+
+Take a divide-and-conquer approach, breaking large problems into
+smaller steps.
+
+Use a short function for each step. Then it's easier to:
+
+* Test that each step works correctly.
+* Modify, reuse, or repurpose a step.
+
+Before you write a function, it's useful to go through several steps:
+
+1. Write down what you want to do, in detail. It can also help to
+   draw a picture of what needs to happen.
+
+2. Check whether there's already a built-in function. Google it!
+
+3. Write the code to handle a simple case first. For data science
+   problems, use a small dataset at this step.
