@@ -1,1 +1,2 @@
-lecture/**/*.pdf
+lecture/**/data
+lecture/**/soln**
