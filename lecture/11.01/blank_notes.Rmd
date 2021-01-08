@@ -1,0 +1,214 @@
+---
+title: "Stat 33A - Lecture Notes 11"
+date: Nov 1, 2020
+output: pdf_document
+---
+
+
+Printing Output
+===============
+
+The `cat` function prints a message to the console:
+```{r}
+
+```
+
+Strings lose their quotes and escape sequences are converted.
+
+The `cat` function always returns `NULL`:
+```{r}
+
+```
+
+
+The `print` function prints R's representation of an object to the console:
+```{r}
+
+```
+
+Strings keep their quotes and escape sequences are not converted.
+
+The `print` function returns the object being printed:
+```{r}
+
+```
+
+The `show` function is similar to `print`, but always returns `NULL`.
+
+A later lecture might cover why both `print` and `show` are necessary.
+
+
+For most output, `print` is the wrong function to use!
+
+
+Formatting Output
+-----------------
+
+_Escape sequences_ allow you to write characters that aren't on your keyboard
+in strings.
+
+Escape sequences always begin with a backslash.
+
+See `?Quotes` for a complete list.
+
+For example, `\n` is a newline:
+```{r}
+
+```
+
+The `paste` function combines strings:
+```{r}
+
+```
+
+The `sprintf` function can substitute values into strings.
+
+Substitutions are marked with `%` followed by a character:
+```{r}
+
+```
+
+
+
+For-loops
+=========
+
+A for-loop runs a block of code once for each element of a vector or list:
+```{r}
+
+```
+Curly braces `{ }` are only required if you have multiple lines of code.
+
+
+You have to write code to save the results from the loop.
+
+In other words, create a variable where you can save results.
+
+For example:
+```{r}
+
+```
+
+Use for-loops when some (or all) of the iterations depend on results from other
+iterations.
+
+If the iterations are not dependent, use one of:
+
+1. Vectorization (because it's faster)
+2. Apply functions (because they're idiomatic)
+
+In some cases, you can use vectorization even when the iterations are
+dependent. For example:
+```{r}
+
+```
+
+
+As another example, let's use a loop to compute Fibonacci numbers.
+
+Each Fibonacci number is the sum of the previous two. The first few Fibonacci
+numbers are:
+```
+1 1 2 3 5 8 13
+```
+
+We can use a loop to compute the first `n` Fibonacci numbers:
+```{r}
+
+```
+
+If you want to reuse this code, you could make it a function:
+```{r}
+
+```
+
+
+Break & Next
+------------
+
+Use `break` to exit a loop early:
+```{r}
+
+```
+
+
+Use `next` to skip to the next iteration early:
+```{r}
+
+```
+
+
+
+Loop Indices
+============
+
+If you need indices, using `1:n` can cause bugs:
+```{r}
+
+```
+
+Use `seq_len(n)` instead:
+```{r}
+
+```
+
+Similarly, using `1:length(x)` can cause bugs:
+```{r}
+
+```
+
+Use `seq_along(x)` instead:
+```{r}
+
+```
+
+More generally, use `seq()` to produce sequences of indices.
+
+
+
+Preallocation
+=============
+
+_Preallocation_ means allocating memory for results before a computation.
+
+These functions allocate vectors:
+
+* `character()`
+* `complex()`
+* `numeric()`
+* `logical()`
+
+* `vector()`
+* `rep()`
+
+Examples:
+```{r}
+
+```
+
+Preallocation is especially important for loops:
+```{r}
+
+```
+
+
+
+Loops Example
+=============
+
+Let's simulate a two-dimensional discrete random walk.
+
+In a random walk, at each time step the walker randomly moves 1 unit along the
+x-coordinates or the y-coordinates.
+
+The algorithm is:
+
+1. Flip a coin to determine whether walker moves in x or y.
+2. Flip a coin to determine whether walker moves `-1` or `+1`.
+3. Update the walker's position.
+4. Repeat 1-3 for the desired number of steps.
+
+We can do this with a for-loop:
+```{r}
+
+```
